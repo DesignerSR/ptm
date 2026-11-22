@@ -1395,6 +1395,9 @@ a:hover .roll::after, button:hover .roll::after { transform: translateY(-100%); 
 }
 @media (max-width: 767px) {
   .s7__avatar { display: none; }   /* no avatar above the title on phones */
+  /* FAQ answers are always shown on phones: keep the calm closed look */
+  .qa.is-open .qa__q { color: inherit; }
+  .qa::before { display: none; }
 }
 @media (max-width: 479px) {
   .form { grid-template-columns: 1fr; }

@@ -58,21 +58,19 @@
     want: 0,       // target
   }));
 
-  /* ---------- open / close ---------- */
-  const setWant = (c, v) => { c.want = v; c.el.classList.toggle('is-open', v === 1); };
+  /* ---------- open / close ----------
+     Phones and touch screens show every answer: it prints in right after
+     its card has appeared (no tapping). With a mouse, hover/focus opens. */
+  const phone = () => innerWidth < 768;
+  const autoOpen = () => !canHover || phone();
+  const setWant = (c, v) => { if (c.want !== v) { c.want = v; c.el.classList.toggle('is-open', v === 1); } };
   cards.forEach((c) => {
     if (canHover) {
-      c.el.addEventListener('mouseenter', () => setWant(c, 1));
-      c.el.addEventListener('mouseleave', () => { if (document.activeElement !== c.el) setWant(c, 0); });
-    } else {
-      c.el.addEventListener('click', () => {
-        const v = c.want ? 0 : 1;
-        cards.forEach((o) => o !== c && setWant(o, 0));
-        setWant(c, v);
-      });
+      c.el.addEventListener('mouseenter', () => { if (!autoOpen()) setWant(c, 1); });
+      c.el.addEventListener('mouseleave', () => { if (!autoOpen() && document.activeElement !== c.el) setWant(c, 0); });
     }
-    c.el.addEventListener('focus', () => setWant(c, 1));
-    c.el.addEventListener('blur', () => setWant(c, 0));
+    c.el.addEventListener('focus', () => { if (!autoOpen()) setWant(c, 1); });
+    c.el.addEventListener('blur', () => { if (!autoOpen()) setWant(c, 0); });
   });
 
   /* ---------- "Was this helpful?" ---------- */
@@ -91,6 +89,8 @@
   let vh = innerHeight;
   addEventListener('resize', () => { vh = innerHeight; });
   let p = reduced ? 1 : 0, last = performance.now();
+  const STEP = 0.55, DUR = 0.8;   // phones: gap between card starts, rise time (s)
+  let queueAt = 0, wasAuto = false;
 
   function tick(now) {
     const dt = Math.min(64, now - last) / 1000;
@@ -104,6 +104,20 @@
       setV(title, '--t', seg(p, 0.0, 0.4));
       setV(rule, '--t', seg(p, 0.1, 0.55, easeInOut));
       setV(helpful, '--t', seg(p, 0.25, 0.5));
+      // Phones: each card rises once it is on screen, strictly one after
+      // another with a short pause, even after a fast flick.
+      if (phone()) {
+        cards.forEach((c) => {
+          const cardTop = top + c.el.offsetTop;
+          if (cardTop > vh) { c.trig = null; c.p = 0; }              // below the screen: reset
+          else if (c.trig == null && cardTop < vh * 0.88) {
+            c.trig = Math.max(now, queueAt);
+            queueAt = c.trig + STEP * 1000;
+          }
+          c.p = c.trig == null ? 0 : easeInOut(clamp((now - c.trig) / (DUR * 1000)));
+          setV(c.el, '--t', c.p);
+        });
+      } else {
       // Cards reveal row by row as each row scrolls into view; within a row
       // they follow one another left → right.
       const cols = innerWidth < 640 ? 1 : innerWidth < 1024 ? 2 : 3;
@@ -119,7 +133,14 @@
         if (Math.abs(target - c.p) < 0.0004) c.p = target;
         setV(c.el, '--t', c.p);
       });
+      }
     }
+
+    // phones / touch: the answer opens as soon as its card is half up
+    const auto = autoOpen();
+    if (auto) cards.forEach((c) => setWant(c, reduced || (c.p || 0) > 0.5 ? 1 : 0));
+    else if (wasAuto) cards.forEach((c) => setWant(c, 0));   // window widened past phone size
+    wasAuto = auto;
 
     // hover state: open slowly (print), close quickly (rewind)
     cards.forEach((c) => {
