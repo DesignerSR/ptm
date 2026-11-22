@@ -302,7 +302,8 @@
       if (Math.abs(t - r.v) > 0.0005) { type(r, t); r.v = t; }
     }
 
-    const c = 1 - range(p, 0.005, 0.06);
+    // gone the moment scrolling starts (first ~40px), back at the very top
+    const c = Math.min(1 - range(p, 0.005, 0.06), 1 - range(scrollY, 0, 40));
     if (Math.abs(c - lastCue) > 0.001) { cue.style.setProperty('--o', c.toFixed(3)); lastCue = c; }
 
     requestAnimationFrame(tick);
