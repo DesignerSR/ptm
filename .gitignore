@@ -1,0 +1,11 @@
+# Source files (originals, not used by the site)
+/BG.mp4
+/2 screen.mp4
+/Hero.png
+/Logo.svg
+/Lay Grotesk/
+
+# Local tooling
+.claude/settings.local.json
+Thumbs.db
+.DS_Store
