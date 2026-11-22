@@ -1457,58 +1457,52 @@ a:hover .roll::after, button:hover .roll::after { transform: translateY(-100%); 
    ========================================================================== */
 
 @media (max-width: 767px) {
-  .hero__pin { --gutter: 16px; }
+  /* Mobile hero (Figma "iPhone 17"): logo left, burger right, tags stacked
+     under the header, headline + Andy's card at the bottom. */
+  .hero__pin { --gutter: 20px; }
 
   .hero { height: 360svh; }
   .hero__pin { min-height: 600px; }
 
-  .nav { height: 64px; }
-  .menu { top: 22px; font-size: 14px; gap: 10px; }
-  .menu__lines { width: 30px; height: 9px; }
-  .logo { top: 24px; width: 76px; margin-left: -38px; }
-  .notch { width: 200px; margin-left: -100px; height: 8px; }
-  .btn--ghost { top: 15px; width: auto; height: 32px; padding: 0 12px; font-size: 14px; }
-  .btn .roll--full { display: none; }
-  .btn .roll--short { display: inline-block; }
+  .nav { height: 100px; }
+  .notch, .nav__rule, .btn--ghost, .lede { display: none; }
+  .logo { left: 0; top: 47px; width: 111px; margin-left: 0; }
+  .menu { left: auto; right: 0; top: 50px; height: 14px; gap: 0; }
+  .menu .roll { display: none; }
+  .menu__lines { width: 40px; height: 14px; }
+  .menu__lines i { height: 2px; }
 
-  .upper {
-    position: absolute; left: var(--gutter); right: var(--gutter); top: 84px;
-    display: flex; flex-direction: column; gap: 16px;
-    z-index: 2;
+  .upper { display: block; }
+  .tags {
+    left: var(--gutter); top: 159px;
+    flex-direction: column; gap: 4px;
+    font-size: 15.5px; line-height: 16px;
   }
-  .tags, .lede { position: static; }
-  .tags { flex-direction: row; flex-wrap: wrap; gap: 6px 12px; font-size: 12.5px; }
-  .tag { gap: 5px; }
+  .tag { gap: 8px; }
 
-  .lede {
-    font-size: 15px; line-height: 1.08; letter-spacing: -0.045em;
-    max-width: 340px;
-  }
-  .lede__line { display: inline; white-space: normal; overflow: visible; padding: 0; margin: 0; }
-  .lede__line:first-child { padding-left: 0; }
-  .lede__line > span { display: inline; transform: none; opacity: var(--t); transition: none; }
+  .title-block { right: var(--gutter); bottom: calc(max(27px, env(safe-area-inset-bottom)) + 146px + 58px); }
+  .badge { font-size: 13.2px; height: 22px; line-height: 22px; padding: 1px 8px 0 8px; margin-bottom: 42px; }
+  .title { font-size: clamp(38px, 13.4vw, 60px); line-height: 0.83; }
 
-  .title-block { right: var(--gutter); bottom: 186px; }
-  .badge { font-size: 13px; height: 24px; line-height: 24px; margin-bottom: 14px; }
-  .title { font-size: clamp(38px, 11.6vw, 54px); line-height: 0.97; }
-
-  .contact { left: var(--gutter); right: var(--gutter); bottom: max(16px, env(safe-area-inset-bottom)); width: auto; height: 132px; }
-  .contact__photo { flex-basis: 100px; }
-  .contact__body { flex: 1; padding: 18px 14px 0 14px; }
+  .contact { left: var(--gutter); right: var(--gutter); bottom: max(27px, env(safe-area-inset-bottom)); width: auto; height: 146px; }
+  .contact__photo { flex-basis: 31.5%; }
+  .contact__body { flex: 1; display: flex; flex-direction: column; padding: 21px 14px 13px 16px; }
   .contact__name { font-size: 17px; }
-  .contact__role { font-size: 14px; }
-  .contact .btn--solid { width: 100%; max-width: 220px; margin-top: 20px; height: 38px; font-size: 16px; }
+  .contact__role { font-size: 13px; margin-top: 3px; }
+  .contact .btn--solid { width: 100%; max-width: 183px; margin-top: auto; height: 40px; font-size: 14.5px; }
 
-  .cue { bottom: 28px; }
+  .cue { display: none; }
 }
 
 @media (max-width: 767px) and (max-height: 700px) {
-  .title-block { bottom: 168px; }
-  .title { font-size: clamp(34px, 10vw, 44px); }
-  .lede { font-size: 14px; }
-  .contact { height: 120px; }
-  .contact__body { padding-top: 14px; }
-  .contact .btn--solid { margin-top: 14px; }
+  .logo { top: 32px; }
+  .menu { top: 35px; }
+  .tags { top: 118px; }
+  .title-block { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 124px + 34px); }
+  .title { font-size: clamp(34px, 11vw, 48px); }
+  .badge { margin-bottom: 26px; }
+  .contact { bottom: max(20px, env(safe-area-inset-bottom)); height: 124px; }
+  .contact__body { padding-top: 15px; padding-bottom: 11px; }
 }
 
 /* ---------- Hover only where it exists ---------------------------------- */
