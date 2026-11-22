@@ -280,6 +280,22 @@
     if (clouds) clouds.size();
   }
 
+  /* ---------- phone scroll gate ----------
+     On phones a fast flick could carry the page past the cards before the
+     last one has appeared. At the end of the intro the scroll is held: the
+     cards finish on their own, stay for a beat, then scrolling is released. */
+  const GATE_HOLD = 0.6;            // s the full set stays before release
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const gate = { armed: true, locked: false, hold: 0, y: 0 };
+  const setGate = (on) => {
+    gate.locked = on;
+    window.__ptmScrollMax = on ? gate.y : undefined;   // read by hero.js smooth wheel
+    if (coarse) document.documentElement.style.overflow = on ? 'hidden' : ''; // stops touch momentum
+  };
+  addEventListener('touchmove', (e) => { if (gate.locked && e.cancelable) e.preventDefault(); }, { passive: false });
+  addEventListener('wheel', (e) => { if (gate.locked && e.deltaY > 0) e.preventDefault(); }, { passive: false });
+  addEventListener('scroll', () => { if (gate.locked && scrollY > gate.y + 1) scrollTo(0, gate.y); }, { passive: true });
+
   /* ---------- loop ---------- */
   let A = null, B = null;      // smoothed tops of the two screens
   let aS = null;               // extra-smoothed intro progress
@@ -325,6 +341,19 @@
     if (aS === null) aS = aTarget;
     aS += (aTarget - aS) * (1 - Math.exp(-dt * 3.2));
     if (Math.abs(aTarget - aS) < 0.0002) aS = aTarget;
+
+    if (phone && !reduced) {
+      const introY = scrollY + rawA;                     // intro top, page coords
+      gate.y = Math.round(introY + INTRO * vh);          // Services about to enter
+      const done = cards[cards.length - 1].v > 0.995;
+      if (!gate.locked && gate.armed && !done && scrollY > gate.y - 1) {
+        scrollTo(0, gate.y); setGate(true); gate.hold = 0;
+      }
+      if (gate.locked) {
+        aS = Math.min(1, aS + dt * 0.5);                 // cards finish on their own
+        if (done) { gate.hold += dt; if (gate.hold >= GATE_HOLD) { setGate(false); gate.armed = false; } }
+      } else if (!gate.armed && scrollY < introY + 0.3 * vh) gate.armed = true; // re-arm when back at the top
+    } else if (gate.locked) setGate(false);
     const a = aS;
     lines.forEach((line, i) => {
       const t = smoother(range(a, 0.0 + i * 0.17, 0.38 + i * 0.17));
@@ -332,7 +361,7 @@
     });
     cards.forEach((c, i) => {
       const t = smoother(range(a, 0.56 + i * 0.13, 0.80 + i * 0.1));
-      if (Math.abs(t - c.v) > 0.0005) { c.el.style.setProperty('--t', t.toFixed(4)); c.v = t; }
+      if (Math.abs(t - c.v) > 0.0005 || (t === 1 && c.v !== 1)) { c.el.style.setProperty('--t', t.toFixed(4)); c.v = t; }
     });
 
     // Screen B: once the film reaches the top, scroll drives the trucks

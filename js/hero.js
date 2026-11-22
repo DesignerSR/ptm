@@ -227,7 +227,8 @@
       if (e.deltaMode === 1) d *= 16;
       else if (e.deltaMode === 2) d *= innerHeight;
       if (!sActive) sTarget = sCurrent = scrollY;
-      const max = document.documentElement.scrollHeight - innerHeight;
+      // window.__ptmScrollMax: a temporary stop set by s2.js (phone card gate)
+      const max = Math.min(document.documentElement.scrollHeight - innerHeight, window.__ptmScrollMax ?? Infinity);
       sTarget = clamp(sTarget + d, 0, max);
       sActive = true;
     }, { passive: false });
@@ -241,6 +242,7 @@
 
   function smoothScrollStep(dt) {
     if (!sActive) return;
+    if (window.__ptmScrollMax !== undefined) sTarget = Math.min(sTarget, window.__ptmScrollMax);
     sCurrent += (sTarget - sCurrent) * (1 - Math.exp(-dt * 6));
     if (Math.abs(sTarget - sCurrent) < 0.4) { sCurrent = sTarget; sActive = false; }
     scrollTo(0, sCurrent);
