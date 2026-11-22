@@ -1435,8 +1435,14 @@ a:hover .roll::after, button:hover .roll::after { transform: translateY(-100%); 
 @media (max-width: 639px) {
   .s2__comp { grid-template-columns: 1fr; padding: 0 16px; }
   .s2__line { white-space: normal; }
-  .card { padding: 14px 14px 16px; }
-  .card__title { margin-top: 12px; }
+  /* Desktop card proportions (297 × 134), capped so the headline and all
+     three cards still fit on short phones. Icon top, copy at the bottom. */
+  .card {
+    height: min(calc((100vw - 32px) * 134 / 297), calc((100svh - 230px) / 3));
+    display: flex; flex-direction: column;
+    padding: 16px 16px 18px;
+  }
+  .card__title { margin-top: auto; }
 }
 
 /* ==========================================================================
