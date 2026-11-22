@@ -21,6 +21,9 @@
   const INTRO = 1.7;   // × vh of pinned scroll for headline + cards (unhurried)
   const DRIVE = 1.0;   // × vh of pinned scroll for the trucks
   const isMobile = () => innerWidth < 1024;
+  // Phones skip screen B (the bridge film): Services slides straight over
+  // the headline + cards screen, and the film's frames are never loaded.
+  const isPhone = () => innerWidth < 768;
 
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const range = (v, a, b) => clamp((v - a) / (b - a));
@@ -269,7 +272,8 @@
     vh = innerHeight;
     const next = isMobile() ? 'm' : 'd';
     if (next !== set) { set = next; if (started) loadSet(); }
-    intro.style.height = `${stage.offsetHeight + INTRO * vh}px`;
+    // on phones + one screen during which the Services sheet slides over it
+    intro.style.height = `${stage.offsetHeight + INTRO * vh + (isPhone() ? vh : 0)}px`;
     // + one screen during which the Services sheet slides over the film
     driveEl.style.height = `${film.offsetHeight + DRIVE * vh + vh}px`;
     sizeCanvas();
@@ -294,7 +298,8 @@
     A += (rawA - A) * k; if (Math.abs(rawA - A) < 0.05) A = rawA;
     B += (rawB - B) * k; if (Math.abs(rawB - B) < 0.05) B = rawB;
 
-    if (A < vh * 3) startLoading();
+    const phone = isPhone();
+    if (A < vh * 3 && !phone) startLoading();
 
     // Slide-over: hero recedes, the sheet's rounded top flattens
     const rise = reduced ? 1 : range(vh - A, 0, vh);
@@ -342,7 +347,7 @@
     }
 
     // Clouds: only while the film is on screen
-    if (clouds && B < vh && B > -(film.offsetHeight + DRIVE * vh + vh)) {
+    if (clouds && !phone && B < vh && B > -(film.offsetHeight + DRIVE * vh + vh)) {
       clouds.render(reduced ? 0 : now / 1000, drive * 0.55);
     }
 
@@ -356,7 +361,7 @@
   }
 
   addEventListener('resize', layout);
-  addEventListener('load', () => { layout(); setTimeout(startLoading, 1500); });
+  addEventListener('load', () => { layout(); setTimeout(() => { if (!isPhone()) startLoading(); }, 1500); });
   if (document.fonts) document.fonts.ready.then(layout);
   layout();
   requestAnimationFrame(tick);

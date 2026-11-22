@@ -1457,6 +1457,9 @@ a:hover .roll::after, button:hover .roll::after { transform: translateY(-100%); 
    ========================================================================== */
 
 @media (max-width: 767px) {
+  /* No bridge film on phones (s2.js skips its frames too) */
+  .s2__drive { display: none; }
+
   /* Mobile hero (Figma "iPhone 17"): logo left, burger right, tags stacked
      under the header, headline + Andy's card at the bottom. */
   .hero__pin { --gutter: 20px; }
