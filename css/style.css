@@ -1393,6 +1393,9 @@ a:hover .roll::after, button:hover .roll::after { transform: translateY(-100%); 
   .foot__bar { grid-template-columns: 1fr 1fr; row-gap: 12px; margin-top: 48px; font-size: 13px; }
   .foot__bar p { grid-column: 1 / -1; }
 }
+@media (max-width: 767px) {
+  .s7__avatar { display: none; }   /* no avatar above the title on phones */
+}
 @media (max-width: 479px) {
   .form { grid-template-columns: 1fr; }
   .field--from, .field--to { grid-column: 1; }
